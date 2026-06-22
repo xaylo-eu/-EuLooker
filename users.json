@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "email": "eva.matejcik@mecasys.sk",
+    "org_type": "University / HEI",
+    "areas": [
+      "Green Energy / Climate"
+    ],
+    "kw_custom": [
+      "pha",
+      "filament"
+    ],
+    "interval": "7days",
+    "registered_at": "2026-06-22",
+    "last_email": null
+  }
+]
