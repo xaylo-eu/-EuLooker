@@ -1,1 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EuLooker — EU Grants Monitor</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #1a1a1a; font-size: 13px; line-height: 1.5; background: #fff; }
 
+/* NAV */
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 44px; border-bottom: 1px solid #e4e8ef; }
+.logo { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 600; color: #1a2340; text-decoration: none; }
+.logo-mark { width: 24px; height: 24px; background: #1a2340; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 13px; height: 13px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; }
+.nav-badge { font-size: 11px; background: #E1F5EE; color: #085041; border: 1px solid #9FE1CB; border-radius: 20px; padding: 2px 10px; }
+
+/* HERO */
+.hero { padding: 20px 24px 16px; border-bottom: 1px solid #e4e8ef; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hero-title { font-size: 22px; font-weight: 700; line-height: 1.25; color: #1a2340; max-width: 520px; margin-bottom: 8px; letter-spacing: -.3px; }
+.hero-sub { font-size: 13px; color: #555; max-width: 440px; margin-bottom: 14px; line-height: 1.6; }
+.hero-btns { display: flex; gap: 8px; margin-bottom: 16px; }
+.btn-primary { padding: 7px 18px; background: #1a2340; color: #fff; border: none; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+.btn-outline { padding: 7px 18px; background: #fff; color: #1a1a1a; border: 1px solid #e4e8ef; border-radius: 7px; font-size: 12px; font-weight: 500; cursor: pointer; text-decoration: none; }
+
+/* STATS */
+.stats-row { display: flex; gap: 28px; padding-top: 14px; border-top: 1px solid #e4e8ef; width: 100%; justify-content: center; margin-bottom: 14px; }
+.stat-item { display: flex; align-items: baseline; gap: 6px; }
+.stat-n { font-size: 20px; font-weight: 700; color: #1a2340; }
+.stat-l { font-size: 11px; color: #888; }
+
+/* PROGRAMMES */
+.prog-row { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.prog-tag { padding: 2px 7px; border-radius: 20px; font-size: 10px; font-weight: 500; border: 1px solid; }
+.p-h { background: #E6F1FB; color: #0C447C; border-color: #B5D4F4; }
+.p-e { background: #FCEBEB; color: #791F1F; border-color: #F7C1C1; }
+.p-l { background: #EAF3DE; color: #27500A; border-color: #C0DD97; }
+.p-i { background: #EEEDFE; color: #3C3489; border-color: #CECBF6; }
+.p-d { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.p-g { background: #F1EFE8; color: #444441; border-color: #D3D1C7; }
+
+/* HOW */
+.how-row { display: grid; grid-template-columns: repeat(4,1fr); border-bottom: 1px solid #e4e8ef; border-top: 1px solid #e4e8ef; }
+.how-step { padding: 10px 18px; border-right: 1px solid #e4e8ef; }
+.how-step:last-child { border-right: none; }
+.how-num { font-size: 10px; font-weight: 600; color: #1D9E75; letter-spacing: .06em; margin-bottom: 3px; }
+.how-title { font-size: 12px; font-weight: 600; color: #1a2340; margin-bottom: 2px; }
+.how-desc { font-size: 11px; color: #555; }
+
+/* KONFIG */
+.konfig { padding: 14px 24px 20px; }
+.konfig-title { font-size: 15px; font-weight: 600; color: #1a2340; margin-bottom: 2px; }
+.konfig-sub { font-size: 12px; color: #555; margin-bottom: 12px; }
+
+.el-label { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #888; margin-bottom: 6px; margin-top: 12px; }
+
+.el-grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 5px; }
+.el-grid5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 5px; }
+.el-grid5 .el-card { padding: 10px 10px; min-height: 70px; }
+
+.el-card { display: flex; flex-direction: column; gap: 2px; padding: 7px 9px; border: 1px solid #e4e8ef; border-radius: 7px; cursor: pointer; background: #fff; transition: border-color .12s, background .12s; user-select: none; }
+.el-card:hover { border-color: #1D9E75; background: #E1F5EE; }
+.el-card.active { border-color: #1D9E75; background: #E1F5EE; }
+.el-card.locked { opacity: .35; pointer-events: none; }
+.el-card-top { display: flex; align-items: flex-start; gap: 5px; font-size: 11px; font-weight: 600; color: #1a2340; line-height: 1.35; }
+.el-card.active .el-card-top { color: #085041; }
+.el-card-sub { font-size: 10px; color: #888; }
+.el-card.active .el-card-sub { color: #0F6E56; }
+
+.el-hint { font-size: 11px; color: #888; margin: 4px 0 10px; }
+
+.el-kw-box { background: #f7f8fa; border: 1px solid #e4e8ef; border-radius: 7px; padding: 8px 10px; margin-bottom: 10px; }
+.el-kw-sub { font-size: 10px; color: #888; margin-bottom: 6px; }
+.el-pills { display: flex; flex-wrap: wrap; gap: 4px; min-height: 20px; margin-bottom: 6px; }
+.el-pill { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 20px; font-size: 11px; }
+.el-pill-oblast { background: #E6F1FB; color: #0C447C; border: 1px solid #B5D4F4; }
+.el-pill-org { background: #EAF3DE; color: #27500A; border: 1px solid #C0DD97; }
+.el-pill-custom { background: #f7f8fa; color: #1a1a1a; border: 1px solid #e4e8ef; }
+.el-pill-x { background: none; border: none; cursor: pointer; color: inherit; opacity: .5; font-size: 10px; padding: 0; line-height: 1; }
+.el-pill-x:hover { opacity: 1; }
+.el-sep { border: none; border-top: 1px solid #e4e8ef; margin: 6px 0; }
+.el-add-row { display: flex; gap: 6px; }
+.el-add-row input { flex: 1; height: 30px; font-size: 12px; border: 1px solid #e4e8ef; border-radius: 6px; padding: 0 10px; outline: none; background: #fff; color: #1a1a1a; }
+.el-add-row input:focus { border-color: #1D9E75; }
+.el-add-row button { height: 30px; padding: 0 12px; font-size: 12px; background: #fff; color: #1a1a1a; border: 1px solid #e4e8ef; border-radius: 6px; cursor: pointer; }
+.el-add-row button:hover { background: #f7f8fa; }
+
+.el-bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; }
+.el-group { display: flex; flex-direction: column; gap: 5px; }
+.el-group label { font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #888; }
+.el-group input[type=email] { height: 34px; font-size: 13px; border: 1px solid #e4e8ef; border-radius: 7px; padding: 0 12px; outline: none; background: #fff; color: #1a1a1a; }
+.el-group input[type=email]:focus { border-color: #1D9E75; }
+.el-freq { display: flex; gap: 5px; }
+.el-freq button { flex: 1; height: 34px; font-size: 11px; border: 1px solid #e4e8ef; border-radius: 6px; background: #fff; color: #555; cursor: pointer; }
+.el-freq button.active { background: #1a2340; color: #fff; border-color: #1a2340; }
+.el-submit { width: 100%; height: 40px; background: #1a2340; color: #fff; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: opacity .15s; }
+.el-submit:hover { opacity: .88; }
+.el-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+/* SUCCESS */
+.el-success { display: none; text-align: center; padding: 40px; }
+.el-check { width: 48px; height: 48px; background: #E1F5EE; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.el-check svg { width: 22px; height: 22px; stroke: #1D9E75; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.el-reset { font-size: 12px; color: #888; cursor: pointer; text-decoration: underline; }
+
+/* FOOTER */
+footer { padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #e4e8ef; }
+footer span { font-size: 11px; color: #888; }
+footer a { font-size: 11px; color: #888; text-decoration: none; margin-left: 12px; }
+footer a:hover { color: #1a1a1a; }
+
+@media (max-width: 640px) {
+  .el-grid4, .el-grid5 { grid-template-columns: repeat(2,1fr); }
+  .el-bottom-row { grid-template-columns: 1fr; }
+  .how-row { grid-template-columns: repeat(2,1fr); }
+  .stats-row { gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><polyline points="2,10 5,6 8,8 11,4 14,6"/></svg>
+    </div>
+    EuLooker
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <a href="#konfig" class="btn-primary">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Set up monitoring
+    </a>
+    <a href="#how" class="btn-outline">How it works</a>
+  </div>
+  <span class="nav-badge">200+ EU programmes · free</span>
+</nav>
+
+<section class="hero">
+  <h1 class="hero-title">Never miss a relevant EU funding call for your organisation</h1>
+  <p class="hero-sub">Automated monitoring of the EC portal. Receive only calls relevant to your organisation type and areas of interest.</p>
+  <div class="stats-row">
+    <div class="stat-item"><span class="stat-n">200+</span><span class="stat-l">EU programmes</span></div>
+    <div class="stat-item"><span class="stat-n">700+</span><span class="stat-l">active calls</span></div>
+    <div class="stat-item"><span class="stat-n">free</span><span class="stat-l">for now</span></div>
+  </div>
+  <div class="prog-row">
+    <span class="prog-tag p-h">Horizon Europe</span>
+    <span class="prog-tag p-e">EDF</span>
+    <span class="prog-tag p-l">LIFE</span>
+    <span class="prog-tag p-i">EIC Accelerator</span>
+    <span class="prog-tag p-i">EIC Pathfinder</span>
+    <span class="prog-tag p-d">Digital Europe</span>
+    <span class="prog-tag p-h">MSCA</span>
+    <span class="prog-tag p-h">ERC</span>
+    <span class="prog-tag p-l">Innovation Fund</span>
+    <span class="prog-tag p-g">CEF</span>
+    <span class="prog-tag p-d">Erasmus+</span>
+    <span class="prog-tag p-e">ISF</span>
+    <span class="prog-tag p-g">EU4Health</span>
+    <span class="prog-tag p-g">+ 190 more</span>
+  </div>
+</section>
+
+<div class="how-row" id="how">
+  <div class="how-step"><div class="how-num">01</div><div class="how-title">Set up your profile</div><div class="how-desc">Organisation type, areas, keywords.</div></div>
+  <div class="how-step"><div class="how-num">02</div><div class="how-title">We scan the portal</div><div class="how-desc">Every week we scan 200+ EU programmes.</div></div>
+  <div class="how-step"><div class="how-num">03</div><div class="how-title">We filter</div><div class="how-desc">Call must match your area AND org type.</div></div>
+  <div class="how-step"><div class="how-num">04</div><div class="how-title">You get an email</div><div class="how-desc">Only new calls you haven't seen yet.</div></div>
+</div>
+
+<div class="konfig" id="konfig">
+  <div id="form-view">
+    <div class="konfig-title">Set up your monitoring</div>
+    <div class="konfig-sub">Takes 2 minutes. You will only receive calls relevant to you.</div>
+
+    <div class="el-label">Organisation type</div>
+    <div class="el-grid4" id="org-grid"></div>
+
+    <div class="el-label">Areas of interest (max. 3)</div>
+    <div class="el-grid5" id="ob-grid"></div>
+    <div class="el-hint" id="ob-hint">Select 1–3 areas — keywords will be added automatically.</div>
+
+    <div class="el-label">Keywords</div>
+    <div class="el-kw-box">
+      <div class="el-kw-sub">🟦 from area &nbsp;·&nbsp; 🟩 from org type &nbsp;·&nbsp; ⬜ custom — keep what you want, remove what you don't, add your own</div>
+      <div class="el-pills" id="kw-pills"></div>
+      <div class="el-sep"></div>
+      <div class="el-add-row">
+        <input type="text" id="kw-input" placeholder="Add custom keyword…">
+        <button onclick="addKw()">+ Add</button>
+      </div>
+    </div>
+
+    <div class="el-bottom-row">
+      <div class="el-group">
+        <label>Your email</label>
+        <input type="email" id="email-input" placeholder="you@email.com">
+      </div>
+      <div class="el-group">
+        <label>Frequency</label>
+        <div class="el-freq">
+          <button class="active" id="f0" onclick="setFreq(0)">Every 7 days</button>
+          <button id="f1" onclick="setFreq(1)">Every 14 days</button>
+          <button id="f2" onclick="setFreq(2)">Every 30 days</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="el-submit" onclick="submitForm()">Activate monitoring →</button>
+  </div>
+
+  <div class="el-success" id="success-view">
+    <div class="el-check">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="font-size:17px;font-weight:600;color:#1a2340;margin-bottom:8px;">Monitoring activated!</h2>
+    <p style="font-size:13px;color:#555;margin-bottom:14px;" id="s-text"></p>
+    <div class="el-pills" id="s-kw" style="justify-content:center;margin-bottom:18px;"></div>
+    <span class="el-reset" onclick="resetForm()">Change settings</span>
+  </div>
+</div>
+
+<footer>
+  <span>EuLooker · open source · free</span>
+  <div>
+    <a href="https://ec.europa.eu/info/funding-tenders/opportunities/portal" target="_blank">EC Portal</a>
+    <a href="https://github.com/xaylo-eu/EuLooker" target="_blank">GitHub</a>
+    <a href="mailto:mecasysdata@gmail.com">Contact</a>
+  </div>
+</footer>
+
+<script>
+const WORKER_URL = 'https://eulooker-register.mecasysdata.workers.dev';
+
+const ORG_TYPES = [
+  { id:'sme',     icon:'🏭', name:'SME',                  kw:['sme','small and medium','smes','eic accelerator','cascade financing','for smes'] },
+  { id:'large',   icon:'🏗️', name:'Large Enterprise',     kw:['large enterprise','large company','large industry','for-profit','private company'] },
+  { id:'hei',     icon:'🎓', name:'University / HEI',      kw:['higher education','university','academic institution','hei','academia'] },
+  { id:'rto',     icon:'🔬', name:'Research Org. (RTO)',   kw:['research organisation','research organization','research center','rto','research institute'] },
+  { id:'public',  icon:'🏛️', name:'Public Sector',        kw:['public body','public authority','municipality','local authority','public administration'] },
+  { id:'ngo',     icon:'🤝', name:'NGO / Association',     kw:['non-governmental','ngo','association','cluster','foundation','civil society'] },
+  { id:'startup', icon:'🚀', name:'Startup / Spin-off',    kw:['startup','start-up','spin-off','spin-out','deep tech','eic pathfinder','scaleup'] },
+  { id:'intl',    icon:'🌍', name:'International Org.',    kw:['international organisation','international organization','intergovernmental','multilateral'] },
+];
+
+const AREAS = [
+  { icon:'🏭', name:'Manufacturing / Industry 4.0', prog:'Horizon CL4 · EDF · Digital Europe',
+    kw:['industry 4.0','industry 5.0','advanced manufacturing','smart factory','digital twin',
+        'industrial automation','cobots','additive manufacturing','3d printing','industrial iot',
+        'made in europe','factory of the future','cyber-physical','smart manufacturing',
+        'industrial transformation','manufacturing excellence','production technology',
+        'automation technology','industrial robot','lean manufacturing','supply chain',
+        'quality control','testing facilities','cnc','industrial digitali'] },
+  { icon:'🤖', name:'AI / Robotics / Deep Tech', prog:'Horizon CL4 · EIC · Digital Europe',
+    kw:['artificial intelligence','machine learning','robotics','autonomous systems','deep learning',
+        'generative ai','computer vision','edge computing','quantum computing','apply ai',
+        'neural network','natural language processing','nlp','large language model',
+        'trustworthy ai','explainable ai','ai safety','human-robot interaction',
+        'embedded ai','foundation model','data-driven'] },
+  { icon:'🌿', name:'Green Energy / Climate', prog:'Horizon CL5 · LIFE · Innovation Fund',
+    kw:['renewable energy','green hydrogen','carbon capture','energy storage','solar energy',
+        'wind energy','net zero','decarbonisation','energy efficiency','smart grid','clean energy',
+        'offshore wind','heat pump','district heating','photovoltaic','battery storage',
+        'power grid','electrolysis','biofuel','geothermal','tidal energy',
+        'carbon neutral','carbon footprint','emission reduction'] },
+  { icon:'🌱', name:'Agro / Bio / Circular', prog:'Horizon CL6 · LIFE · EAFRD',
+    kw:['precision agriculture','smart farming','bioeconomy','bio-based','biodegradable',
+        'sustainable packaging','soil health','microbiome','agritech','biomaterial',
+        'food security','crop monitoring','bioreactor','fermentation','composting',
+        'waste valorisation','biopolymer','green chemistry','plant-based','agroecology',
+        'food system','circular bioeconomy'] },
+  { icon:'🏥', name:'Health / Medicine / Biotech', prog:'Horizon CL1 · EU4Health · EIC',
+    kw:['medical device','diagnostics','drug development','clinical trial','personalised medicine',
+        'digital health','cancer research','biotechnology','antimicrobial','genomics',
+        'vaccine','proteomics','wearable health','mental health','telemedicine',
+        'rehabilitation','medical ai','in vitro','cell therapy','rare disease',
+        'health data','patient','hospital'] },
+  { icon:'🛡️', name:'Defence / Security / Drones', prog:'EDF · ISF · Horizon',
+    kw:['drone','uav','unmanned','defence','dual-use','counter-drone','border surveillance',
+        'cbrn','naval','underwater','security technology','swarm','autonomous underwater',
+        'auv','counter-uas','situational awareness','cybersecurity','critical infrastructure',
+        'explosive detection','surveillance','radar','military','defense'] },
+  { icon:'🚀', name:'Space Tech', prog:'Horizon CL4 · ESA · Copernicus',
+    kw:['satellite','earth observation','space exploration','copernicus','galileo','new space',
+        'remote sensing','space transportation','launch vehicle','reusable rocket','in-orbit',
+        'space debris','lunar','space manufacturing','cubesat','nanosatellite',
+        'space economy','esa','on-orbit'] },
+  { icon:'🚗', name:'Mobility / Transport / Smart City', prog:'Horizon CL5 · CEF',
+    kw:['electric vehicle','autonomous driving','urban mobility','smart city',
+        'zero emission vehicle','battery technology','hydrogen vehicle','sustainable transport',
+        'charging infrastructure','vehicle to grid','fleet management','micro-mobility',
+        'autonomous bus','rail','traffic management','connected vehicle',
+        'automated mobility','ccam','logistics','last mile'] },
+  { icon:'💧', name:'Water / Oceans / Environment', prog:'Horizon CL6 · LIFE · EMFAF',
+    kw:['water purification','ocean cleaning','marine litter','water quality','blue economy',
+        'wastewater','aquaculture','desalination','flood risk','drought','groundwater',
+        'ocean acidification','marine ecosystem','plastic recycling','wetland',
+        'river restoration','water reuse','water management','marine protected'] },
+  { icon:'📚', name:'Education / Social Innovation', prog:'Erasmus+ · ESF · EIC',
+    kw:['education technology','vocational training','digital skills','social innovation',
+        'edtech','reskilling','upskilling','vocational excellence','lifelong learning',
+        'micro-credential','apprenticeship','youth employment','inclusion','disability',
+        'rural development','stem education','higher education','skills gap',
+        'community','social enterprise'] },
+];
+
+let selOrg = null, sel = [], kws = [], freq = 0;
+
+function renderOrg() {
+  document.getElementById('org-grid').innerHTML = ORG_TYPES.map((o,i) =>
+    `<div class="el-card${selOrg===i?' active':''}" onclick="toggleOrg(${i})">
+      <div class="el-card-top"><span>${o.icon}</span><span>${o.name}</span></div>
+    </div>`).join('');
+}
+
+function toggleOrg(i) {
+  if (selOrg !== null) kws = kws.filter(k => k.type !== 'org');
+  selOrg = (selOrg === i) ? null : i;
+  if (selOrg !== null) ORG_TYPES[selOrg].kw.forEach(k => { if (!kws.find(x=>x.t===k)) kws.push({t:k,type:'org'}); });
+  renderOrg(); renderKw();
+}
+
+function renderAreas() {
+  document.getElementById('ob-grid').innerHTML = AREAS.map((o,i) =>
+    `<div class="el-card${sel.includes(i)?' active':''}${sel.length>=3&&!sel.includes(i)?' locked':''}" onclick="toggleArea(${i})">
+      <div class="el-card-top"><span>${o.icon}</span><span>${o.name}</span></div>
+      <div class="el-card-sub">${o.prog}</div>
+    </div>`).join('');
+}
+
+function toggleArea(i) {
+  const o = AREAS[i], idx = sel.indexOf(i);
+  if (idx > -1) { sel.splice(idx,1); kws = kws.filter(k => k.type!=='oblast' || !o.kw.includes(k.t)); }
+  else {
+    if (sel.length >= 3) { document.getElementById('ob-hint').textContent = 'Maximum 3 areas. Please deselect one first.'; return; }
+    sel.push(i); o.kw.forEach(k => { if (!kws.find(x=>x.t===k)) kws.push({t:k,type:'oblast'}); });
+  }
+  document.getElementById('ob-hint').textContent = sel.length ? `Selected: ${sel.length} / 3` : 'Select 1–3 areas — keywords will be added automatically.';
+  renderAreas(); renderKw();
+}
+
+function renderKw() {
+  document.getElementById('kw-pills').innerHTML = kws.map((k,i) => {
+    const cls = k.type==='oblast'?'el-pill-oblast':k.type==='org'?'el-pill-org':'el-pill-custom';
+    return `<span class="el-pill ${cls}">${k.t}<button class="el-pill-x" onclick="removeKw(${i})">×</button></span>`;
+  }).join('');
+}
+
+function removeKw(i) { kws.splice(i,1); renderKw(); }
+
+function addKw() {
+  const inp = document.getElementById('kw-input');
+  const v = inp.value.trim().toLowerCase();
+  if (!v) return;
+  if (!kws.find(x=>x.t===v)) kws.push({t:v,type:'custom'});
+  inp.value=''; renderKw();
+}
+
+document.getElementById('kw-input').addEventListener('keydown', e => { if(e.key==='Enter') addKw(); });
+
+function setFreq(i) {
+  freq = i;
+  [0,1,2].forEach(j => document.getElementById('f'+j).classList.toggle('active', j===i));
+}
+
+function submitForm() {
+  const email = document.getElementById('email-input').value.trim();
+  if (!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
+  if (selOrg === null) { alert('Please select your organisation type.'); return; }
+  if (sel.length === 0) { alert('Please select at least one area of interest.'); return; }
+  if (kws.length === 0) { alert('Please add at least one keyword.'); return; }
+
+  const orgName  = ORG_TYPES[selOrg].name;
+  const areas    = sel.map(i => AREAS[i].name);
+  const kwCustom = kws.filter(k => k.type === 'custom').map(k => k.t);
+  const freqDays = ['7','14','30'][freq];
+
+  const btn = document.querySelector('.el-submit');
+  btn.textContent = 'Registering…';
+  btn.disabled = true;
+
+  fetch(WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email, org_type: orgName, areas, kw_custom: kwCustom,
+      interval: `${freqDays}days`
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.ok) {
+      const freqText = ['7 days','14 days','30 days'][freq];
+      document.getElementById('s-text').textContent =
+        `Calls will be sent to ${email} — every ${freqText} · ${orgName}`;
+      document.getElementById('s-kw').innerHTML =
+        kws.map(k=>`<span class="el-pill el-pill-oblast">${k.t}</span>`).join('');
+      document.getElementById('form-view').style.display = 'none';
+      document.getElementById('success-view').style.display = 'block';
+    } else { throw new Error(data.error || 'Unknown error'); }
+  })
+  .catch(err => {
+    alert('Registration error. Please try again or contact mecasysdata@gmail.com\n\n' + err.message);
+    btn.textContent = 'Activate monitoring →';
+    btn.disabled = false;
+  });
+}
+
+function resetForm() {
+  document.getElementById('form-view').style.display = 'block';
+  document.getElementById('success-view').style.display = 'none';
+  const btn = document.querySelector('.el-submit');
+  btn.textContent = 'Activate monitoring →';
+  btn.disabled = false;
+}
+
+renderOrg(); renderAreas();
+</script>
+</body>
+</html>
