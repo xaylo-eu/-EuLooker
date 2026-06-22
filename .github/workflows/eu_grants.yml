@@ -2,7 +2,7 @@ name: EU Grants Agent
 
 on:
   schedule:
-    - cron: "30 6 * * 1"
+    - cron: "0 7 * * *"  # every day at 7:00 UTC (9:00 SK time)
   workflow_dispatch:
 
 permissions:
@@ -11,7 +11,7 @@ permissions:
 jobs:
   run-agent:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - name: Checkout
@@ -30,10 +30,10 @@ jobs:
         env:
           EMAIL_HESLO: ${{ secrets.EMAIL_HESLO }}
 
-      - name: Save seen identifiers
+      - name: Save history and users
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add seen_identifiers.json users.json
-          git commit -m "update data [skip ci]" || echo "nothing to commit"
+          git commit -m "update history + users [skip ci]" || echo "nothing to commit"
           git push
