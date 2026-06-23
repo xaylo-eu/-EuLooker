@@ -1,16 +1,14 @@
 [
   {
     "email": "eva.matejcik@mecasys.sk",
-    "org_type": "University / HEI",
+    "org_type": "Startup / Spin-off",
     "areas": [
       "Green Energy / Climate"
     ],
-    "kw_custom": [
-      "pha",
-      "filament"
-    ],
-    "interval": "7days",
+    "kw_custom": [],
+    "interval": "14days",
     "registered_at": "2026-06-22",
-    "last_email": null
+    "last_email": null,
+    "updated_at": "2026-06-23"
   }
 ]
