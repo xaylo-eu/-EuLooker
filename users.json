@@ -10,5 +10,16 @@
     "registered_at": "2026-06-22",
     "last_email": "2026-06-23",
     "updated_at": "2026-06-23"
+  },
+  {
+    "email": "j.miklusak@orava.sk",
+    "org_type": "SME",
+    "areas": [
+      "Manufacturing / Industry 4.0"
+    ],
+    "kw_custom": [],
+    "interval": "7days",
+    "registered_at": "2026-06-24",
+    "last_email": null
   }
 ]
