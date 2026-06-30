@@ -1,10 +1,13 @@
 # ╔══════════════════════════════════════════════════════════════════╗
-# ║   EuLooker – EC Funding Monitor  |  v7                         ║
+# ║   EuLooker – EC Funding Monitor  |  v7.1                       ║
 # ║   Changes v7:                                                   ║
 # ║   - Reads users.json, sends individual email per user           ║
 # ║   - Respects interval: 7 / 14 / 30 days                        ║
 # ║   - AND logic: area + organisation type                         ║
 # ║   - Custom user keywords                                        ║
+# ║   Changes v7.1:                                                 ║
+# ║   - FIX: skip calls whose deadline has already passed,          ║
+# ║     instead of relying only on EC API "status" field            ║
 # ╚══════════════════════════════════════════════════════════════════╝
 
 import requests, json, re, time, os, smtplib
@@ -165,6 +168,19 @@ def _ts_to_dt(ts_ms):
     except:
         return None
 
+# ── FIX v7.1: check whether a call's deadline has already passed ──
+# EC API's "status" field sometimes stays "Open"/"Forthcoming" for days
+# after the real deadline, so we verify locally against today's date
+# (UTC) instead of trusting status alone.
+def _is_past_deadline(deadline_raw):
+    if not deadline_raw:
+        return False  # no date available — don't block
+    try:
+        deadline_dt = datetime.strptime(deadline_raw[:10], "%Y-%m-%d").date()
+        return deadline_dt < datetime.now(timezone.utc).date()
+    except ValueError:
+        return False  # unparsable date — don't block
+
 # ══════════════════════════════════════════════════════════════════
 # INTERVAL LOGIC
 # ══════════════════════════════════════════════════════════════════
@@ -279,8 +295,17 @@ def find_calls_for_user(user, history):
 
     # Classify with AND filter
     results = []
+    expired_skipped = 0
     for ident in new_ids:
         hit    = all_raw[ident]
+        meta   = hit['metadata']
+
+        # ── FIX v7.1: drop calls whose deadline has already passed ──
+        deadline_raw = meta.get('deadlineDate', [''])[0][:10]
+        if _is_past_deadline(deadline_raw):
+            expired_skipped += 1
+            continue
+
         detail = get_detail(ident)
         if not detail:
             time.sleep(0.2)
@@ -294,7 +319,6 @@ def find_calls_for_user(user, history):
         has_org  = _contains(ft, org_kw) if org_kw else True
 
         if has_area and has_org:
-            meta     = hit['metadata']
             prog_raw = meta.get('frameworkProgramme', [''])[0]
             results.append({
                 'identifier': ident,
@@ -302,7 +326,7 @@ def find_calls_for_user(user, history):
                 'programme' : _programme_name(prog_raw),
                 'status'    : meta.get('status', [''])[0],
                 'startDate' : meta.get('startDate', [''])[0][:10],
-                'deadline'  : meta.get('deadlineDate', [''])[0][:10],
+                'deadline'  : deadline_raw,
                 'summary'   : _summarize(desc, 4),
                 'link'      : meta.get('url', [''])[0],
                 'kw_area'   : _find(ft, area_kw)[:4],
@@ -310,7 +334,7 @@ def find_calls_for_user(user, history):
             })
         time.sleep(0.3)
 
-    p(f"  Relevant calls: {len(results)}")
+    p(f"  Relevant calls: {len(results)}  |  Skipped (expired deadline): {expired_skipped}")
 
     # Add all fetched to history (including those that didn't match)
     new_history = {**history, **{i: datetime.now().strftime('%Y-%m-%d') for i in all_raw}}
