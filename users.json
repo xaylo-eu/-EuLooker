@@ -22,5 +22,18 @@
     "registered_at": "2026-06-24",
     "last_email": "2026-07-15",
     "updated_at": "2026-06-24"
+  },
+  {
+    "email": "pavlina.zitnakova@mecasys.sk",
+    "org_type": "SME",
+    "areas": [
+      "Manufacturing / Industry 4.0",
+      "Health / Medicine / Biotech",
+      "Space Tech"
+    ],
+    "kw_custom": [],
+    "interval": "7days",
+    "registered_at": "2026-07-20",
+    "last_email": null
   }
 ]
